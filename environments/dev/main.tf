@@ -3,3 +3,4 @@ module "data_bucket" {
   bucket_name = var.bucket_name
   environment = var.environment
 }
+
