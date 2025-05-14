@@ -5,19 +5,19 @@ pipelineJob('netgod-terraform-pull-request') {
         githubProjectUrl('https://github.com/yudapinhas/netgod-terraform')
     }
     definition {
-        cpsScm {
-            scm {
-                git {
-                    remote {
-                        url('git@github.com:yudapinhas/netgod-terraform.git')
-                        credentials('github-ssh-key')
-                        refspec('+refs/pull/*:refs/remotes/origin/pr/*')
-                    }
-                    branches('${ghprbActualCommit}')
-                }
-                scriptPath('buildScripts/jenkins/pipeline/pull_request.groovy')
+      cpsScm {
+        scm {
+          git {
+            remote {
+              url(repo.sshUrl)
+              credentials('github-ssh-key')
+              refspec('+refs/pull/*/head:refs/remotes/origin/pr/*')
+            }
+            branches('${ghprbActualCommit}')         
             }
         }
+        scriptPath('buildScripts/jenkins/pipelines/pull_request.groovy')
+      }
     }
     triggers {
         githubPullRequest {
