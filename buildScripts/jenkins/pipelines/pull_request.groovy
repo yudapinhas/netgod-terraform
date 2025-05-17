@@ -26,23 +26,27 @@ pipeline {
                     // Debug: Log PR variables
                     echo "ghprbActualCommit: ${env.ghprbActualCommit}"
                     echo "ghprbGhRepository: ${env.ghprbGhRepository}"
+                    echo "ghprbSourceBranch: ${env.ghprbSourceBranch}"
                     echo "Checkout commit: ${commit}"
                     echo "Repo URL: ${repoUrl}"
 
                     checkout([
                         $class: 'GitSCM',
-                        branches: [[name: commit]],
+                        branches: [[name: "refs/pull/${env.ghprbPullId}/head"]],
                         userRemoteConfigs: [[
                             url: repoUrl,
                             credentialsId: 'github-ssh-key',
-                            refspec: '+refs/pull/*:refs/remotes/origin/pr/* +refs/heads/*:refs/remotes/origin/*'
+                            refspec: "+refs/pull/${env.ghprbPullId}/head:refs/remotes/origin/pr/${env.ghprbPullId}/head +refs/heads/*:refs/remotes/origin/*"
                         ]],
                         extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'netgod-terraform']]
                     ])
 
-                    // Debug: Log checked-out commit
+                    // Debug: Log checked-out commit and branch
                     dir('netgod-terraform') {
-                        sh 'git rev-parse HEAD'
+                        sh '''
+                            git rev-parse HEAD
+                            git branch --show-current
+                        '''
                     }
                 }
             }
