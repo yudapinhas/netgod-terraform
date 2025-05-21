@@ -14,12 +14,21 @@ pipeline {
     }
 
     options {
+        skipDefaultCheckout()
         buildDiscarder(logRotator(numToKeepStr: '10'))
     }
 
     stages {
-        stage('Checkout') {
-            steps { checkout scm }
+        stage('Checkout PR branch') {
+            steps {
+                checkout([$class: 'GitSCM',
+                          branches: [[name: "${env.ghprbActualCommit}"]],
+                          userRemoteConfigs: [[
+                              url: env.REPO_URL,
+                              credentialsId: 'github-ssh-key',
+                              refspec: "+refs/pull/${env.ghprbPullId}/head:refs/remotes/origin/pr/${env.ghprbPullId}"
+                          ]]])
+            }
         }
 
         stage('Determine TF_ENV') {
