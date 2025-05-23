@@ -55,8 +55,8 @@ pipeline {
                 withCredentials([string(credentialsId: 'terraform-cloud-token', variable: 'TF_TOKEN_app_terraform_io')]) {
                     sh '''
                         set -eux
+                        export TF_WORKSPACE="netgod-${TF_ENV}"
                         terraform init
-                        terraform workspace select -or-create $TF_ENV
                         terraform plan -var-file="$TF_ENV.tfvars"
                     '''
                 }
