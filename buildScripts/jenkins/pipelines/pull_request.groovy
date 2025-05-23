@@ -50,23 +50,19 @@ pipeline {
             }
         }
 
-        stage('Prepare Terraform') {
-            steps {
-                withCredentials([string(credentialsId: 'terraform-cloud-token', variable: 'TERRAFORM_CLOUD_TOKEN')]) {
-                    sh 'terraform init'
-                    sh "terraform workspace select -or-create ${env.TF_ENV}"
-                }
-            }
-        }
-
         stage('Terraform Plan') {
             steps {
-                withCredentials([string(credentialsId: 'terraform-cloud-token', variable: 'TERRAFORM_CLOUD_TOKEN')]) {
-                    sh '''
-                        set -eux
-                        terraform workspace show
-                        terraform plan -var-file="${TF_ENV}.tfvars"
-                    '''
+                script {
+                    withCredentials([string(credentialsId: 'terraform-cloud-token', variable: 'RAW_TFC_TOKEN')]) {
+                        withEnv(["TERRAFORM_CLOUD_TOKEN=${env.RAW_TFC_TOKEN}"]) {
+                            sh '''
+                                set -eux
+                                terraform init
+                                terraform workspace select -or-create $TF_ENV
+                                terraform plan -var-file="$TF_ENV.tfvars"
+                            '''
+                        }
+                    }
                 }
             }
         }
