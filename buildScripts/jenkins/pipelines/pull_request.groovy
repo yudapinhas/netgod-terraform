@@ -56,8 +56,9 @@ pipeline {
                     sh '''
                         set -eux
                         export TF_WORKSPACE="netgod-${TF_ENV}"
+                        cp "${TF_ENV}.tfvars" terraform.tfvars
                         terraform init
-                        terraform plan -var-file="$TF_ENV.tfvars"
+                        terraform plan
                     '''
                 }
             }
