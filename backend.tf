@@ -3,9 +3,6 @@ terraform {
 
   backend "remote" {
     organization = "yudapinhas"
-
-    workspaces {
-      name = "dev"
-    }
+    workspaces { prefix = "netgod-" }
   }
 }
