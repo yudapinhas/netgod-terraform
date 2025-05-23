@@ -67,7 +67,6 @@ pipeline {
                         terraform workspace show
                         terraform plan -var-file="${TF_ENV}.tfvars"
                     '''
-                    }
                 }
             }
         }
