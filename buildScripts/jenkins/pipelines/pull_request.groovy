@@ -11,7 +11,6 @@ pipeline {
         ORG = 'yudapinhas'
         REPO_URL  = "git@github.com:${ORG}/${REPO_NAME}.git"
         TF_ENV    = 'dev'
-        TERRAFORM_CLOUD_TOKEN = credentials('terraform-cloud-token')
     }
 
     options {
@@ -36,50 +35,38 @@ pipeline {
         stage('Determine TF_ENV') {
             steps {
                 script {
-                    def changedFiles = sh(
-                        script: 'git diff --name-only origin/master...HEAD',
+                    def tfvarsFile = sh(
+                        script: 'git diff --name-only origin/master...HEAD | grep .tfvars || true',
                         returnStdout: true
-                    ).trim()
-
-                    def tfvarsFile = changedFiles
-                                     .split('\n')
-                                     .find { it.endsWith('.tfvars') }
+                    ).trim().split('\n').find { it.endsWith('.tfvars') }
+        
                     if (tfvarsFile) {
                         env.TF_ENV = tfvarsFile.replace('.tfvars','')
-                        echo "Detected TF_ENV: ${env.TF_ENV}"
+                        echo "Detected TF_ENV from PR diff: ${env.TF_ENV}"
                     } else {
-                        echo "No .tfvars changes – using default TF_ENV: ${env.TF_ENV}"
+                        echo "No .tfvars changes — using default TF_ENV: ${env.TF_ENV}"
                     }
                 }
             }
         }
 
         stage('Prepare Terraform') {
-          steps {
-            withEnv(["TERRAFORM_CLOUD_TOKEN=${env.TERRAFORM_CLOUD_TOKEN}"]) {
-              sh 'terraform init'
-              sh "terraform workspace select -or-create ${env.TF_ENV}"
+            steps {
+                withCredentials([string(credentialsId: 'terraform-cloud-token', variable: 'TERRAFORM_CLOUD_TOKEN')]) {
+                    sh 'terraform init'
+                    sh "terraform workspace select -or-create ${env.TF_ENV}"
+                }
             }
-          }
         }
 
         stage('Terraform Plan') {
             steps {
-                script {
-                    def changedFiles = sh(
-                        script: 'git diff --name-only origin/master...HEAD',
-                        returnStdout: true
-                    ).trim().split('\n')
-
-                    if (changedFiles) {
-                        echo "Changed files: ${changedFiles.join(', ')}"
-                        sh '''
-                            set -eux
-                            terraform workspace show
-                            terraform plan -var-file="${TF_ENV}.tfvars"
-                        '''
-                    } else {
-                        echo "No changes detected. Skipping terraform plan."
+                withCredentials([string(credentialsId: 'terraform-cloud-token', variable: 'TERRAFORM_CLOUD_TOKEN')]) {
+                    sh '''
+                        set -eux
+                        terraform workspace show
+                        terraform plan -var-file="${TF_ENV}.tfvars"
+                    '''
                     }
                 }
             }
