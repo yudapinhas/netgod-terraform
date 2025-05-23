@@ -55,13 +55,12 @@ pipeline {
         }
 
         stage('Prepare Terraform') {
-            steps {
-                sh '''
-                    set -eux
-                    terraform init
-                    terraform workspace select -or-create ${TF_ENV}
-                '''
+          steps {
+            withEnv(["TERRAFORM_CLOUD_TOKEN=${env.TERRAFORM_CLOUD_TOKEN}"]) {
+              sh 'terraform init'
+              sh "terraform workspace select -or-create ${env.TF_ENV}"
             }
+          }
         }
 
         stage('Terraform Plan') {
