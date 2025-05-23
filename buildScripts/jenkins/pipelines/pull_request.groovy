@@ -10,7 +10,8 @@ pipeline {
         REPO_NAME = "netgod-terraform"
         ORG = 'yudapinhas'
         REPO_URL  = "git@github.com:${ORG}/${REPO_NAME}.git"
-        TF_ENV    = 'dev'    // default for CI
+        TF_ENV    = 'dev'
+        TERRAFORM_CLOUD_TOKEN = credentials('terraform-cloud-token')
     }
 
     options {
