@@ -52,17 +52,14 @@ pipeline {
 
         stage('Terraform Plan') {
             steps {
-                script {
-                    withCredentials([string(credentialsId: 'terraform-cloud-token', variable: 'RAW_TFC_TOKEN')]) {
-                        withEnv(["TERRAFORM_CLOUD_TOKEN=${env.RAW_TFC_TOKEN}"]) {
-                            sh '''
-                                set -eux
-                                terraform init
-                                terraform workspace select -or-create $TF_ENV
-                                terraform plan -var-file="$TF_ENV.tfvars"
-                            '''
-                        }
-                    }
+                withCredentials([string(credentialsId: 'terraform-cloud-token', variable: 'TERRAFORM_CLOUD_TOKEN')]) {
+                    sh '''
+                        set -eux
+                        export TERRAFORM_CLOUD_TOKEN=$TERRAFORM_CLOUD_TOKEN
+                        terraform init
+                        terraform workspace select -or-create $TF_ENV
+                        terraform plan -var-file="$TF_ENV.tfvars"
+                    '''
                 }
             }
         }
