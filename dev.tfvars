@@ -1,4 +1,4 @@
 project_id       = "netgod-play"
-credentials_file = "../netgod-private/cloud_providers/gcp/netgod-play/credentials.json"
+credentials_file = file("${path.module}/gcp/credentials.json")
 bucket_name      = "netgod-data-play"
 force_destroy    = true
