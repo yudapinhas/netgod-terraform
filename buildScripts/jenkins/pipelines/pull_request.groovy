@@ -65,17 +65,13 @@ pipeline {
         }
         
         stage('Terraform Plan') {
-            steps {
-                withCredentials([
-                  string(credentialsId: 'terraform-cloud-token', variable: 'TF_TOKEN_app_terraform_io')
-                ]) {
-                    sh '''
-                        set -eux
-                        terraform init
-                        terraform plan
-                    '''
-                }
-            }
+           steps {
+             sh '''
+               set -eux
+               terraform init
+               terraform plan
+             '''
+           }
         }
     }
 
