@@ -10,5 +10,5 @@ terraform {
 provider "google" {
   project     = var.project_id
   region      = var.region
-  credentials = file("../${path.module}/netgod-private/cloud_providers/gcp/netgod-play/credentials.json")
+  credentials = file("${path.module}/../netgod-private/cloud_providers/gcp/netgod-play/credentials.json")
 }
