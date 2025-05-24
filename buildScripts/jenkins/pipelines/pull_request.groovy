@@ -66,17 +66,17 @@ pipeline {
         stage('Terraform Plan') {
           steps {
             withCredentials([
-              string(credentialsId: 'terraform-cloud-token', variable: 'TF_TOKEN_app_terraform_io')
-            ]) {
-              sh '''
-                set -eux    
-                terraform init
-                terraform plan
-              '''
+              string(credentialsId: 'terraform-cloud-token', variable: 'RAW_TF_TOKEN')]) {
+              withEnv(['TF_TOKEN_app_terraform_io=$RAW_TF_TOKEN']) {
+                sh '''
+                  set -eux
+                  terraform init
+                  terraform plan
+                '''
+              }
             }
           }
         }
-      }
 
     post {
         cleanup { cleanWs() }
