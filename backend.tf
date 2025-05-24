@@ -1,7 +1,8 @@
 terraform {
   required_version = ">= 1.0.0"
 
-  backend "local" {
-    path = "terraform.tfstate"
+  backend "remote" {
+    organization = "yudapinhas"
+    workspaces { prefix = "netgod-" }
   }
 }

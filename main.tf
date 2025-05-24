@@ -4,3 +4,4 @@ module "data" {
   location      = var.location
   force_destroy = var.force_destroy
 }
+
