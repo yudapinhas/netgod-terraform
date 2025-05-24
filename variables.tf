@@ -9,11 +9,6 @@ variable "region" {
   description = "GCP region"
 }
 
-variable "credentials_file" {
-  type        = string
-  description = "Path to GCP service account JSON key"
-}
-
 variable "bucket_name" {
   type        = string
   description = "Name of the GCS bucket"
