@@ -50,20 +50,33 @@ pipeline {
             }
         }
 
-        stage('Terraform Plan') {
-            steps {
-                withCredentials([string(credentialsId: 'terraform-cloud-token', variable: 'TF_TOKEN_app_terraform_io')]) {
-                    sh '''
-                        set -eux
-                        export TF_WORKSPACE="netgod-${TF_ENV}"
-                        cp "${TF_ENV}.tfvars" terraform.tfvars
-                        terraform init
-                        terraform plan
-                    '''
-                }
+        stage('Prepare environment') {
+          steps {
+            withCredentials([file(credentialsId: 'gcp-sa-json', variable: 'GCP_KEY')]) {
+              script { env.TF_WORKSPACE = "netgod-${env.TF_ENV}" }
+              sh '''
+                set -eux
+                cp "${TF_ENV}.tfvars" terraform.tfvars
+                mkdir -p gcp && cp "$GCP_KEY" gcp/credentials.json
+              '''
             }
+          }
         }
-    }
+        
+        stage('Terraform Plan') {
+          steps {
+            withCredentials([
+              string(credentialsId: 'terraform-cloud-token', variable: 'TF_TOKEN_app_terraform_io')
+            ]) {
+              sh '''
+                set -eux    
+                terraform init
+                terraform plan
+              '''
+            }
+          }
+        }
+      }
 
     post {
         cleanup { cleanWs() }
