@@ -11,7 +11,6 @@ pipeline {
         ORG = 'yudapinhas'
         REPO_URL  = "git@github.com:${ORG}/${REPO_NAME}.git"
         TF_ENV    = 'dev'
-        TF_TOKEN_app_terraform_io = credentials('terraform-cloud-token')
     }
 
     options {
